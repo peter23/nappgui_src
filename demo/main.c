@@ -7,40 +7,23 @@ typedef struct _app_t App;
 struct _app_t
 {
     Window *window;
-    TextView *text;
-    uint32_t clicks;
+    Edit *edit;
 };
-
-/*---------------------------------------------------------------------------*/
-
-static void i_OnButton(App *app, Event *e)
-{
-    textview_printf(app->text, "Button click (%d)\n", app->clicks);
-    app->clicks += 1;
-    unref(e);
-}
 
 /*---------------------------------------------------------------------------*/
 
 static Panel *i_panel(App *app)
 {
     Panel *panel = panel_create();
-    Layout *layout = layout_create(1, 3);
-    Label *label = label_create();
-    Button *button = button_push();
-    TextView *text = textview_create();
-    app->text = text;
-    label_text(label, "Hello!, I'm a label");
-    button_text(button, "Click Me!");
-    button_OnClick(button, listener(app, i_OnButton, App));
-    layout_label(layout, label, 0, 0);
-    layout_button(layout, button, 0, 1);
-    layout_textview(layout, text, 0, 2);
-    layout_hsize(layout, 0, 250);
-    layout_vsize(layout, 2, 100);
-    layout_margin(layout, 5);
-    layout_vmargin(layout, 0, 5);
-    layout_vmargin(layout, 1, 5);
+    Layout *layout = layout_create(1, 1);
+    layout_margin(layout, 25);
+    {
+        Edit *edit = edit_create();
+        edit_editable(edit, FALSE);
+        edit_text(edit, "...");
+        app->edit = edit;
+        layout_edit(layout, edit, 0, 0);
+    }
     panel_layout(panel, layout);
     return panel;
 }
@@ -56,6 +39,9 @@ static void i_OnClose(App *app, Event *e)
 
 /*---------------------------------------------------------------------------*/
 
+typedef byte_t* pbytet;
+DeclSt(pbytet);
+
 static App *i_create(void)
 {
     App *app = heap_new0(App);
@@ -66,6 +52,25 @@ static App *i_create(void)
     window_origin(app->window, v2df(500, 200));
     window_OnClose(app->window, listener(app, i_OnClose, App));
     window_show(app->window);
+
+    Clock *clock = clock_create(.1);
+    ArrSt(pbytet)* ptrs = arrst_create(pbytet);
+    for(int i = 0; i < 10000000; i++) {
+        pbytet* ptr = arrst_new(ptrs, pbytet);
+        *ptr = heap_malloc(64, "test");
+    }
+    arrst_foreach(ptr, ptrs, pbytet)
+        *ptr = heap_realloc(*ptr, 64, 128, "test");
+    arrst_end()
+    arrst_foreach(ptr, ptrs, pbytet)
+        heap_free(ptr, 128, "test");
+    arrst_end()
+    arrst_destroy(&ptrs, NULL, pbytet);
+    String* edit_str = str_printf("%f", clock_elapsed(clock));
+    edit_text(app->edit, tc(edit_str));
+    str_destroy(&edit_str);
+    clock_destroy(&clock);
+
     return app;
 }
 
