@@ -29,6 +29,10 @@ endif()
 #------------------------------------------------------------------------------
 macro(nap_config_compiler)
 
+add_subdirectory(${NAPPGUI_ROOT_PATH}/rpmalloc-cmake ${NAPPGUI_ROOT_PATH}/rpmalloc-cmake-bin)
+include_directories(${NAPPGUI_ROOT_PATH}/rpmalloc/rpmalloc)
+link_libraries($<BUILD_INTERFACE:rpmalloc>)
+
 include(${NAPPGUI_ROOT_PATH}/prj/NAppUtils.cmake)
 
 if (WIN32)

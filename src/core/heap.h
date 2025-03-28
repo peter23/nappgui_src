@@ -15,7 +15,7 @@
 
 __EXTERN_C
 
-_core_api void heap_start_mt(void);
+/*_core_api void heap_start_mt(void);
 
 _core_api void heap_end_mt(void);
 
@@ -41,7 +41,44 @@ _core_api void heap_free(byte_t **mem, const uint32_t size, const char_t *name);
 
 _core_api void heap_auditor_add(const char_t *name);
 
-_core_api void heap_auditor_delete(const char_t *name);
+_core_api void heap_auditor_delete(const char_t *name);*/
+
+#include "rpmalloc.h"
+
+#define heap_start_mt(...)
+
+#define heap_end_mt(...)
+
+#define heap_verbose(...)
+
+#define heap_stats(...)
+
+#define heap_leaks(...)
+
+#define heap_malloc_imp(size, name, equal_sized) \
+        cast(rpmalloc(size), byte_t)
+
+#define heap_calloc_imp(size, name, equal_sized) \
+        cast(rpcalloc(1, size), byte_t)
+
+#define heap_realloc(mem, size, new_size, name) \
+        cast(rprealloc(cast(mem, void), new_size), byte_t)
+
+#define heap_aligned_malloc_imp(size, align, name, equal_sized) \
+        cast(rpaligned_alloc(align, size), byte_t)
+
+#define heap_aligned_calloc_imp(size, align, name, equal_sized) \
+        cast(rpaligned_calloc(align, 1, size), byte_t)
+
+#define heap_aligned_realloc(mem, size, new_size, align, name) \
+        cast(rpaligned_realloc(cast(mem, void), align, new_size, size, 0), byte_t)
+
+#define heap_free(mem, size, name) \
+        (rpfree(cast(*mem, void)), *mem = NULL)
+
+#define heap_auditor_add(...)
+
+#define heap_auditor_delete(...)
 
 __END_C
 

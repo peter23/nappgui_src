@@ -15,11 +15,22 @@
 
 __EXTERN_C
 
-_sewer_api byte_t *bmem_aligned_malloc(const uint32_t size, const uint32_t align);
+/*_sewer_api byte_t *bmem_aligned_malloc(const uint32_t size, const uint32_t align);
 
 _sewer_api byte_t *bmem_aligned_realloc(byte_t *mem, const uint32_t size, const uint32_t new_size, const uint32_t align);
 
-_sewer_api void bmem_free(byte_t *mem);
+_sewer_api void bmem_free(byte_t *mem);*/
+
+#include "rpmalloc.h"
+
+#define bmem_aligned_malloc(size, align) \
+        cast(rpaligned_alloc(align, size), byte_t)
+
+#define bmem_aligned_realloc(mem, size, new_size, align) \
+        cast(rpaligned_realloc(cast(mem, void), align, new_size, size, 0), byte_t)
+
+#define bmem_free(mem) \
+        rpfree(cast(mem, void))
 
 _sewer_api void bmem_set1(byte_t *dest, const uint32_t size, const byte_t mask);
 
