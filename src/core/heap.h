@@ -13,9 +13,11 @@
 
 #include "core.hxx"
 
+#include <malloc.h>
+
 __EXTERN_C
 
-_core_api void heap_start_mt(void);
+/*_core_api void heap_start_mt(void);
 
 _core_api void heap_end_mt(void);
 
@@ -41,7 +43,41 @@ _core_api void heap_free(byte_t **mem, const uint32_t size, const char_t *name);
 
 _core_api void heap_auditor_add(const char_t *name);
 
-_core_api void heap_auditor_delete(const char_t *name);
+_core_api void heap_auditor_delete(const char_t *name);*/
+
+#define heap_start_mt(...)
+
+#define heap_end_mt(...)
+
+#define heap_verbose(...)
+
+#define heap_stats(...)
+
+#define heap_leaks(...)
+
+#define heap_malloc_imp(size, name, equal_sized) \
+        cast(malloc(size), byte_t)
+
+#define heap_calloc_imp(size, name, equal_sized) \
+        cast(calloc(1, size), byte_t)
+
+#define heap_realloc(mem, size, new_size, name) \
+        cast(realloc(cast(mem, void), new_size), byte_t)
+
+#define heap_aligned_malloc_imp(size, align, name, equal_sized) \
+        cast(_aligned_malloc(align, size), byte_t)
+
+_core_api byte_t *heap_aligned_calloc_imp(const uint32_t size, const uint32_t align, const char_t *name, const bool_t equal_sized);
+
+#define heap_aligned_realloc(mem, size, new_size, align, name) \
+        cast(_aligned_realloc(cast(mem, void), align, new_size, size, 0), byte_t)
+
+#define heap_free(mem, size, name) \
+        (free(cast(*mem, void)), *mem = NULL)
+
+#define heap_auditor_add(...)
+
+#define heap_auditor_delete(...)
 
 __END_C
 

@@ -104,112 +104,112 @@ static HANDLE i_HEAP = NULL;
 
 /*---------------------------------------------------------------------------*/
 
-void _bmem_start(void)
-{
-    cassert_unref(i_HEAP == NULL, i_HEAP);
-#if defined(__MEMORY_AUDITOR__)
-#else
-/*i_HEAP = HeapCreate(0, 0, 0);*/
-#endif
-}
+// void _bmem_start(void)
+// {
+//     cassert_unref(i_HEAP == NULL, i_HEAP);
+// #if defined(__MEMORY_AUDITOR__)
+// #else
+// /*i_HEAP = HeapCreate(0, 0, 0);*/
+// #endif
+// }
 
-/*---------------------------------------------------------------------------*/
+// /*---------------------------------------------------------------------------*/
 
-void _bmem_finish(void)
-{
-#if defined(__MEMORY_SUBSYTEM_CHECKING__)
-    cassert(i_mem_is_empty() == TRUE);
-#endif
-}
+// void _bmem_finish(void)
+// {
+// #if defined(__MEMORY_SUBSYTEM_CHECKING__)
+//     cassert(i_mem_is_empty() == TRUE);
+// #endif
+// }
 
-/*---------------------------------------------------------------------------*/
+// /*---------------------------------------------------------------------------*/
 
-void _bmem_atexit(void)
-{
-#if defined(__MEMORY_AUDITOR__)
-#if _WITH_CRTDBG
-    _CrtDumpMemoryLeaks();
-#endif
-#else
-    cassert(i_HEAP == NULL);
-/*HeapDestroy(i_HEAP);*/
-#endif
-}
+// void _bmem_atexit(void)
+// {
+// #if defined(__MEMORY_AUDITOR__)
+// #if _WITH_CRTDBG
+//     _CrtDumpMemoryLeaks();
+// #endif
+// #else
+//     cassert(i_HEAP == NULL);
+// /*HeapDestroy(i_HEAP);*/
+// #endif
+// }
 
-/*---------------------------------------------------------------------------*/
+// /*---------------------------------------------------------------------------*/
 
-byte_t *bmem_aligned_malloc(const uint32_t size, const uint32_t align)
-{
-    void *mem = NULL;
+// byte_t *bmem_aligned_malloc(const uint32_t size, const uint32_t align)
+// {
+//     void *mem = NULL;
 
-#if defined(__MEMORY_AUDITOR__)
-#if _WITH_CRTDBG
-    mem = _aligned_malloc_dbg((size_t)size, (size_t)align, __FILE__, __LINE__);
-#else
-    mem = _aligned_malloc((size_t)size, (size_t)align);
-#endif
-#else
-    /*mem = HeapAlloc(i_HEAP, 0, (SIZE_T)size);*/
-    mem = _aligned_malloc((size_t)size, (size_t)align);
-#endif
+// #if defined(__MEMORY_AUDITOR__)
+// #if _WITH_CRTDBG
+//     mem = _aligned_malloc_dbg((size_t)size, (size_t)align, __FILE__, __LINE__);
+// #else
+//     mem = _aligned_malloc((size_t)size, (size_t)align);
+// #endif
+// #else
+//     /*mem = HeapAlloc(i_HEAP, 0, (SIZE_T)size);*/
+//     mem = _aligned_malloc((size_t)size, (size_t)align);
+// #endif
 
-#if defined(__MEMORY_SUBSYTEM_CHECKING__)
-    i_mem_append(mem);
-#endif
-    cassert((mem != NULL) && ((intptr_t)mem % align) == 0);
-    return cast(mem, byte_t);
-}
+// #if defined(__MEMORY_SUBSYTEM_CHECKING__)
+//     i_mem_append(mem);
+// #endif
+//     cassert((mem != NULL) && ((intptr_t)mem % align) == 0);
+//     return cast(mem, byte_t);
+// }
 
-/*---------------------------------------------------------------------------*/
+// /*---------------------------------------------------------------------------*/
 
-byte_t *bmem_aligned_realloc(byte_t *mem, const uint32_t size, const uint32_t new_size, const uint32_t align)
-{
-    void *new_mem = NULL;
+// byte_t *bmem_aligned_realloc(byte_t *mem, const uint32_t size, const uint32_t new_size, const uint32_t align)
+// {
+//     void *new_mem = NULL;
 
-    unref(size);
+//     unref(size);
 
-#if defined(__MEMORY_SUBSYTEM_CHECKING__)
-    i_mem_remove(mem);
-#endif
+// #if defined(__MEMORY_SUBSYTEM_CHECKING__)
+//     i_mem_remove(mem);
+// #endif
 
-#if defined(__MEMORY_AUDITOR__)
-#if _WITH_CRTDBG
-    new_mem = _aligned_realloc_dbg(mem, (size_t)new_size, (size_t)align, __FILE__, __LINE__);
-#else
-    new_mem = _aligned_realloc(mem, (size_t)new_size, (size_t)align);
-#endif
-#else
-    /* new_mem = HeapReAlloc(i_HEAP, 0, (LPVOID)mem, (SIZE_T)size); */
-    new_mem = _aligned_realloc(mem, (size_t)new_size, (size_t)align);
-    unref(size);
-#endif
+// #if defined(__MEMORY_AUDITOR__)
+// #if _WITH_CRTDBG
+//     new_mem = _aligned_realloc_dbg(mem, (size_t)new_size, (size_t)align, __FILE__, __LINE__);
+// #else
+//     new_mem = _aligned_realloc(mem, (size_t)new_size, (size_t)align);
+// #endif
+// #else
+//     /* new_mem = HeapReAlloc(i_HEAP, 0, (LPVOID)mem, (SIZE_T)size); */
+//     new_mem = _aligned_realloc(mem, (size_t)new_size, (size_t)align);
+//     unref(size);
+// #endif
 
-#if defined(__MEMORY_SUBSYTEM_CHECKING__)
-    i_mem_append(new_mem);
-#endif
-    cassert((mem != NULL) && ((intptr_t)mem % align) == 0);
-    return cast(new_mem, byte_t);
-}
+// #if defined(__MEMORY_SUBSYTEM_CHECKING__)
+//     i_mem_append(new_mem);
+// #endif
+//     cassert((mem != NULL) && ((intptr_t)mem % align) == 0);
+//     return cast(new_mem, byte_t);
+// }
 
-/*---------------------------------------------------------------------------*/
+// /*---------------------------------------------------------------------------*/
 
-void bmem_free(byte_t *mem)
-{
-#if defined(__MEMORY_SUBSYTEM_CHECKING__)
-    i_mem_remove(mem);
-#endif
+// void bmem_free(byte_t *mem)
+// {
+// #if defined(__MEMORY_SUBSYTEM_CHECKING__)
+//     i_mem_remove(mem);
+// #endif
 
-#if defined(__MEMORY_AUDITOR__)
-#if _WITH_CRTDBG
-    _aligned_free_dbg(mem);
-#else
-    _aligned_free(mem);
-#endif
-#else
-    /*HeapFree(i_HEAP, 0, (LPVOID)mem);*/
-    _aligned_free(mem);
-#endif
-}
+// #if defined(__MEMORY_AUDITOR__)
+// #if _WITH_CRTDBG
+//     _aligned_free_dbg(mem);
+// #else
+//     _aligned_free(mem);
+// #endif
+// #else
+//     /*HeapFree(i_HEAP, 0, (LPVOID)mem);*/
+//     _aligned_free(mem);
+// #endif
+// }
 
 /*---------------------------------------------------------------------------*/
 

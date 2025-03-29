@@ -13,13 +13,24 @@
 
 #include "sewer.hxx"
 
+#include <malloc.h>
+
 __EXTERN_C
 
-_sewer_api byte_t *bmem_aligned_malloc(const uint32_t size, const uint32_t align);
+/*_sewer_api byte_t *bmem_aligned_malloc(const uint32_t size, const uint32_t align);
 
 _sewer_api byte_t *bmem_aligned_realloc(byte_t *mem, const uint32_t size, const uint32_t new_size, const uint32_t align);
 
-_sewer_api void bmem_free(byte_t *mem);
+_sewer_api void bmem_free(byte_t *mem);*/
+
+#define bmem_aligned_malloc(size, align) \
+        cast(_aligned_malloc(align, size), byte_t)
+
+#define bmem_aligned_realloc(mem, size, new_size, align) \
+        cast(_aligned_realloc(cast(mem, void), align, new_size, size, 0), byte_t)
+
+#define bmem_free(mem) \
+        free(cast(mem, void))
 
 _sewer_api void bmem_set1(byte_t *dest, const uint32_t size, const byte_t mask);
 
